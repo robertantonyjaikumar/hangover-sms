@@ -1,14 +1,41 @@
+// Description: This file contains the helper functions for handling HTTP requests and responses.
+// This file contains the helper functions for handling HTTP requests and responses.
 package utils
 
 import (
-	"github.com/gin-gonic/gin"
 	"hangover/structs"
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
-func SuccessResponse(c *gin.Context, message string, code int, data interface{}) {
-	c.JSON(200, structs.Response{code, message, data})
+func SuccessResponse(c *gin.Context, message string, data interface{}) {
+	c.JSON(http.StatusOK, structs.Response{Status: "success", Msg: cases.Title(language.English).String(message), Data: data})
 }
 
-func ErrorResponse(c *gin.Context, message string, code int, data interface{}) {
-	c.JSON(200, structs.Response{code, message, data})
+func ErrorResponse(c *gin.Context, message string, data interface{}) {
+	c.AbortWithStatusJSON(http.StatusOK, structs.Response{Status: "fail", Msg: cases.Title(language.English).String(message), Data: data})
+}
+func UnAuthorizedResponse(c *gin.Context, message string, data interface{}) {
+	c.AbortWithStatusJSON(http.StatusUnauthorized, structs.Response{Status: "fail", Msg: cases.Title(language.English).String(message), Data: data})
+}
+
+func GetPaginationParams(c *gin.Context) (offset int, limit int) {
+	var err error
+	offsetStr := c.Query("offset")
+	offset, err = strconv.Atoi(offsetStr)
+	if err != nil || offset < 0 {
+		offset = 0
+	}
+
+	limitStr := c.Query("limit")
+	limit, err = strconv.Atoi(limitStr)
+	if err != nil || limit < 1 {
+		limit = 10
+	}
+
+	return offset, limit
 }

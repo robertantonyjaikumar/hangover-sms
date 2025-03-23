@@ -4,8 +4,10 @@ database:
   driver: postgres
   host: localhost
   port: 5432
-  dbname: mg
-env: "local"
+  dbname: sms
+  user: postgres
+  password: postgres
+env: local
 access_secret: test-code
 issuer: hangover
 seed_path: "/Users/jai/Documents/Projects/UK/gin-starter/seeds/"

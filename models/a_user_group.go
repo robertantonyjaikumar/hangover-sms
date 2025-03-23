@@ -2,24 +2,25 @@ package models
 
 import (
 	"fmt"
+
 	"github.com/robertantonyjaikumar/hangover-common/database"
 	"github.com/robertantonyjaikumar/hangover-common/logger"
 	"go.uber.org/zap"
 )
 
-type UserGroup struct {
+type Group struct {
 	PreModel
 	Name        string `gorm:"unique;not null"`
 	Description string
 	IsActive    *bool `json:"is_active"`
 }
 
-func (UserGroup) TableName() string {
+func (Group) TableName() string {
 	return "user_groups"
 }
 
 func SeedUserGroup(model interface{}) error {
-	userGroups, ok := model.(*[]UserGroup)
+	userGroups, ok := model.(*[]Group)
 	if !ok {
 		return fmt.Errorf("invalid model type")
 	}

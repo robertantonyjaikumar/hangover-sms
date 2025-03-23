@@ -2,11 +2,12 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"hangover/models"
 	"hangover/structs"
 	"hangover/utils"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 type AuthRepo struct{}
@@ -22,30 +23,33 @@ func (a AuthRepo) Login(c *gin.Context) {
 				// Collect all validation error messages
 				errorMessages = append(errorMessages, fmt.Sprintf("Field '%s' %s", e.Field(), e.Tag()))
 			}
-			utils.ErrorResponse(c, "Validation error", 400, errorMessages)
+			utils.ErrorResponse(c, "Validation error", errorMessages)
 		} else {
 			// If it’s another error (not validation error)
-			utils.ErrorResponse(c, "Invalid request", 400, err.Error())
+			utils.ErrorResponse(c, "Invalid request", err.Error())
 		}
 		return
 	}
 
 	user, err := models.ValidateUserByUserNameAndPassword(loginRequest.Username, loginRequest.Password)
 	if err != nil {
-		utils.ErrorResponse(c, "Invalid username or password", 400, err.Error())
+		utils.ErrorResponse(c, "Invalid username or password", err.Error())
 		return
 	}
 
 	Token, err := utils.GenerateJWT(user)
 	if err != nil {
-		utils.ErrorResponse(c, "Error generating token", 500, err.Error())
+		utils.ErrorResponse(c, "Error generating token", err.Error())
 		return
 	}
-	utils.SuccessResponse(c, "Login successful", 200, Token)
+	utils.SuccessResponse(c, "Login successful", Token)
 	return
 }
 
-func (a AuthRepo) Logout(c *gin.Context) {}
+func (a AuthRepo) Logout(c *gin.Context) {
+	utils.SuccessResponse(c, "Logout successful", nil)
+	return
+}
 
 func (a AuthRepo) Register(c *gin.Context) {}
 

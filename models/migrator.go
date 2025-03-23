@@ -1,10 +1,11 @@
 package models
 
 import (
+	models "hangover/models/utils"
+
 	"github.com/robertantonyjaikumar/hangover-common/database"
 	"github.com/robertantonyjaikumar/hangover-common/logger"
 	"go.uber.org/zap"
-	models "hangover/models/utils"
 )
 
 func GetTables() []interface{} {
@@ -14,7 +15,8 @@ func GetTables() []interface{} {
 		&Permission{},
 		&UserRole{},
 		&RolePermission{},
-		&UserGroup{},
+		&Group{},
+		&Todo{},
 	}
 }
 
@@ -30,9 +32,9 @@ func MigrateDB() {
 
 func SeedDB() {
 	seed := []models.Seed{
-		{Model: &[]UserGroup{}, FileName: "user_groups.json", CreateFunc: SeedUserGroup},
-		{Model: &[]Role{}, FileName: "roles.json", CreateFunc: SeedRole},
-		{Model: &[]User{}, FileName: "users.json", CreateFunc: SeedUser},
+		// {Model: &[]Group{}, FileName: "user_groups.json", CreateFunc: SeedUserGroup},
+		// {Model: &[]Role{}, FileName: "roles.json", CreateFunc: SeedRole},
+		// {Model: &[]User{}, FileName: "users.json", CreateFunc: SeedUser},
 	}
 	for _, s := range seed {
 		if err := models.SeedModel(s.FileName, s.Model, s.CreateFunc); err != nil {

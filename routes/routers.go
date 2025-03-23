@@ -1,11 +1,12 @@
 package routes
 
 import (
+	"time"
+
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/robertantonyjaikumar/hangover-common/logger"
 	"github.com/robertantonyjaikumar/hangover-common/middlewares"
-	"time"
 )
 
 func NewRouter() *gin.Engine {
@@ -24,6 +25,10 @@ func NewRouter() *gin.Engine {
 		authGroup := v1.Group("auth")
 		{
 			AuthRoutes(authGroup)
+		}
+		todoGroup := v1.Group("todo")
+		{
+			TodoRoutes(todoGroup)
 		}
 	}
 	return router

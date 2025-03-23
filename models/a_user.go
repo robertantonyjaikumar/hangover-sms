@@ -2,21 +2,26 @@ package models
 
 import (
 	"fmt"
+	models "hangover/models/utils"
+
 	"github.com/robertantonyjaikumar/hangover-common/database"
 	"github.com/robertantonyjaikumar/hangover-common/logger"
 	"go.uber.org/zap"
-	models "hangover/models/utils"
 )
 
 type User struct {
 	PreModelWithUUID
-	Username     string    `json:"username" gorm:"unique;not null"`
-	Email        string    `json:"email" gorm:"unique;not null"`
-	PasswordHash string    `json:"password_hash"`
-	UserGroup    uint      `json:"user_group"`
-	Group        UserGroup `gorm:"foreignKey:UserGroup"`
-	Roles        []Role    `gorm:"many2many:user_roles;"`
-	IsActive     *bool     `json:"is_active"`
+	Username     string `json:"username" gorm:"uniqueIndex;not null"`
+	FirstName    string `json:"first_name"`
+	MiddleName   string `json:"middle_name"`
+	LastName     string `json:"last_name"`
+	DisplayName  string `json:"display_name"`
+	Email        string `json:"email" gorm:"uniqueIndex;not null"`
+	PasswordHash string `json:"password_hash"`
+	UserGroup    uint   `json:"user_group"`
+	Group        Group  `gorm:"foreignKey:UserGroup"`
+	Roles        []Role `gorm:"many2many:user_roles;"`
+	IsActive     *bool  `json:"is_active"`
 }
 
 func (u *User) TableName() string {
