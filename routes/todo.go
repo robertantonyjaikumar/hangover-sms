@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"hangover/controllers"
+	"sms/controllers"
 
 	"github.com/gin-gonic/gin"
 )

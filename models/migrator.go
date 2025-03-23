@@ -1,7 +1,7 @@
 package models
 
 import (
-	models "hangover/models/utils"
+	models "sms/models/utils"
 
 	"github.com/robertantonyjaikumar/hangover-common/database"
 	"github.com/robertantonyjaikumar/hangover-common/logger"

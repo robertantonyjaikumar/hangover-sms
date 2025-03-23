@@ -2,7 +2,7 @@ package models
 
 import (
 	"fmt"
-	models "hangover/models/utils"
+	models "sms/models/utils"
 
 	"github.com/robertantonyjaikumar/hangover-common/database"
 	"github.com/robertantonyjaikumar/hangover-common/logger"
@@ -18,14 +18,12 @@ type User struct {
 	DisplayName  string `json:"display_name"`
 	Email        string `json:"email" gorm:"uniqueIndex;not null"`
 	PasswordHash string `json:"password_hash"`
-	UserGroup    uint   `json:"user_group"`
-	Group        Group  `gorm:"foreignKey:UserGroup"`
-	Roles        []Role `gorm:"many2many:user_roles;"`
-	IsActive     *bool  `json:"is_active"`
-}
+	RefreshToken string `gorm:"type:text"`
 
-func (u *User) TableName() string {
-	return "users"
+	UserGroup uint   `json:"user_group"`
+	Group     Group  `gorm:"foreignKey:UserGroup"`
+	Roles     []Role `gorm:"many2many:user_roles;"`
+	IsActive  *bool  `json:"is_active"`
 }
 
 func GetUserByUserName(username string) (*User, error) {

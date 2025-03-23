@@ -1,8 +1,9 @@
 package routes
 
 import (
+	"sms/controllers"
+
 	"github.com/gin-gonic/gin"
-	"hangover/controllers"
 )
 
 func HealthRoutes(router *gin.Engine) {
