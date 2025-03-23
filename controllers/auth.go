@@ -86,19 +86,3 @@ func (a AuthRepo) Logout(c *gin.Context) {
 
 	utils.SuccessResponse(c, "", nil)
 }
-
-func (a AuthRepo) Register(c *gin.Context) {
-	var user models.User
-
-	if err := c.ShouldBindJSON(&user); err != nil {
-		utils.ErrorResponse(c, err.Error(), nil)
-		return
-	}
-
-	if err := models.Create(c, &user); err != nil {
-		utils.ErrorResponse(c, err.Error(), nil)
-		return
-	}
-
-	utils.SuccessResponse(c, "", user)
-}

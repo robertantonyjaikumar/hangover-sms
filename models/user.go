@@ -26,11 +26,6 @@ type User struct {
 	RefreshToken  string     `gorm:"type:text"`
 	LastLoginAt   *time.Time `json:"last_login_at"`
 	LastLoginIP   string     `json:"last_login_ip"`
-
-	UserGroup uint   `json:"user_group"`
-	Group     Group  `gorm:"foreignKey:UserGroup"`
-	Roles     []Role `gorm:"many2many:user_roles;"`
-	IsActive  *bool  `json:"is_active"`
 }
 
 func SeedUser(model interface{}) error {

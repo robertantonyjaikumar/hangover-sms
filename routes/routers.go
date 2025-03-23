@@ -30,6 +30,10 @@ func NewRouter() *gin.Engine {
 		{
 			TodoRoutes(todoGroup)
 		}
+		userGroup := v1.Group("user")
+		{
+			UserRoutes(userGroup)
+		}
 	}
 	return router
 }

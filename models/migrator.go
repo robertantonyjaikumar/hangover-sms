@@ -35,7 +35,7 @@ func SeedDB() {
 		// {Model: &[]Group{}, FileName: "user_groups.json", CreateFunc: SeedUserGroup},
 		// {Model: &[]Role{}, FileName: "roles.json", CreateFunc: SeedRole},
 		// {Model: &[]User{}, FileName: "users.json", CreateFunc: SeedUser},
-		{Model: &[]Todo{}, FileName: "todos.json", CreateFunc: SeedTodo},
+		// {Model: &[]Todo{}, FileName: "todos.json", CreateFunc: SeedTodo},
 	}
 	for _, s := range seed {
 		if err := models.SeedModel(s.FileName, s.Model, s.CreateFunc); err != nil {
