@@ -24,41 +24,41 @@ func Update(c context.Context, item interface{}, updates interface{}, conds ...i
 }
 
 // GetTodosByPagination retrieves Todos with pagination and optional filters
-func GetAllByPagination(c context.Context, offset, limit int, conds ...interface{}) (todos []Todo, err error) {
+func GetAllByPagination(c context.Context, item interface{}, offset, limit int, conds ...interface{}) (err error) {
 	query := database.Db.Limit(limit).Offset(offset)
 
-	if result := query.Find(&todos, conds...); result.Error != nil {
-		return nil, result.Error
+	if result := query.Find(item, conds...); result.Error != nil {
+		return result.Error
 	}
-	return todos, nil
+	return nil
 }
 
-func GetAll(c context.Context, conds ...interface{}) (todos []Todo, err error) {
-	if result := database.Db.Find(&todos, conds...); result.Error != nil {
-		return nil, result.Error
+func GetAll(c context.Context, item interface{}, conds ...interface{}) (err error) {
+	if result := database.Db.Find(item, conds...); result.Error != nil {
+		return result.Error
 	}
-	return todos, nil
+	return nil
 }
 
-func First(c context.Context, conds ...interface{}) (todo Todo, err error) {
-	if result := database.Db.First(&todo, conds...); result.Error != nil {
-		return todo, result.Error
+func First(c context.Context, item interface{}, conds ...interface{}) (err error) {
+	if result := database.Db.First(item, conds...); result.Error != nil {
+		return result.Error
 	}
-	return todo, nil
+	return nil
 }
 
-func Last(c context.Context, conds ...interface{}) (todo Todo, err error) {
-	if result := database.Db.Last(&todo, conds...); result.Error != nil {
-		return todo, result.Error
+func Last(c context.Context, item interface{}, conds ...interface{}) (err error) {
+	if result := database.Db.Last(item, conds...); result.Error != nil {
+		return result.Error
 	}
-	return todo, nil
+	return nil
 }
 
-func Take(c context.Context, conds ...interface{}) (todo Todo, err error) {
-	if result := database.Db.Take(&todo, conds...); result.Error != nil {
-		return todo, result.Error
+func Take(c context.Context, item interface{}, conds ...interface{}) (err error) {
+	if result := database.Db.Take(item, conds...); result.Error != nil {
+		return result.Error
 	}
-	return todo, nil
+	return nil
 }
 
 func Delete(c context.Context, value interface{}, conds ...interface{}) error {
