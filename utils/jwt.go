@@ -5,9 +5,12 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/robertantonyjaikumar/hangover-common/config"
 )
 
-// GenerateToken creates a new JWT token with a specified expiry duration
+var jwtSecret = config.CFG.V.GetString("jwt.secret")
+
+// GenerateToken creates a new JWT token with expiration
 func GenerateToken(userID uint, expiry time.Duration) (string, error) {
 	secret := os.Getenv("JWT_SECRET")
 	claims := jwt.MapClaims{
@@ -18,7 +21,7 @@ func GenerateToken(userID uint, expiry time.Duration) (string, error) {
 	return token.SignedString([]byte(secret))
 }
 
-// ParseToken verifies and extracts claims from a JWT token
+// ParseToken verifies a token and extracts claims
 func ParseToken(tokenString string) (*jwt.MapClaims, error) {
 	secret := os.Getenv("JWT_SECRET")
 
