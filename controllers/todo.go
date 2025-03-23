@@ -27,9 +27,9 @@ func (t TodoRepo) Create(c *gin.Context) {
 }
 
 func (t TodoRepo) GetAll(c *gin.Context) {
+	var todos []models.Todo
 
-	todos, err := models.GetAll(c)
-	if err != nil {
+	if err := models.GetAll(c, &todos); err != nil {
 		utils.ErrorResponse(c, err.Error(), nil)
 		return
 	}
@@ -38,9 +38,10 @@ func (t TodoRepo) GetAll(c *gin.Context) {
 }
 
 func (t TodoRepo) Get(c *gin.Context) {
+	var todo models.Todo
 	id := c.Param("id")
-	todo, err := models.First(c, id)
-	if err != nil {
+
+	if err := models.First(c, &todo, id); err != nil {
 		utils.ErrorResponse(c, err.Error(), nil)
 		return
 	}
@@ -49,6 +50,7 @@ func (t TodoRepo) Get(c *gin.Context) {
 }
 
 func (t TodoRepo) Update(c *gin.Context) {
+	var todo models.Todo
 	id := c.Param("id")
 	var updates map[string]interface{}
 	if err := c.ShouldBindJSON(&updates); err != nil {
@@ -60,8 +62,8 @@ func (t TodoRepo) Update(c *gin.Context) {
 		utils.ErrorResponse(c, err.Error(), nil)
 		return
 	}
-	todo, err := models.First(c, id)
-	if err != nil {
+
+	if err := models.First(c, &todo, id); err != nil {
 		utils.ErrorResponse(c, err.Error(), nil)
 		return
 	}
@@ -70,8 +72,8 @@ func (t TodoRepo) Update(c *gin.Context) {
 
 func (t TodoRepo) Delete(c *gin.Context) {
 	id := c.Param("id")
-	err := models.Delete(c, &models.Todo{}, id)
-	if err != nil {
+
+	if err := models.Delete(c, &models.Todo{}, id); err != nil {
 		utils.ErrorResponse(c, err.Error(), nil)
 		return
 	}
@@ -79,9 +81,10 @@ func (t TodoRepo) Delete(c *gin.Context) {
 }
 
 func (t TodoRepo) GetAllByPagination(c *gin.Context) {
+	var todos []models.Todo
 	offset, limit := utils.GetPaginationParams(c)
-	todos, err := models.GetAllByPagination(c, offset, limit)
-	if err != nil {
+
+	if err := models.GetAllByPagination(c, &todos, offset, limit); err != nil {
 		utils.ErrorResponse(c, err.Error(), nil)
 		return
 	}
