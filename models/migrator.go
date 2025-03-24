@@ -11,11 +11,6 @@ import (
 func GetTables() []interface{} {
 	return []interface{}{
 		&User{},
-		&Role{},
-		&Permission{},
-		&UserRole{},
-		&RolePermission{},
-		&Group{},
 		&Todo{},
 		// crud-generator-migration
 	}

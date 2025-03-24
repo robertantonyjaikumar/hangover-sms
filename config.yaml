@@ -12,5 +12,4 @@ jwt:
   secret: $eEcr3t
   access_token_expire_in: 300
   refresh_token_expire_in: 86400
-  issuer: hangover
 seed_path: "/Users/jai/Documents/Projects/UK/gin-starter/seeds/"

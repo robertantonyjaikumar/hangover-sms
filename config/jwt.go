@@ -6,7 +6,6 @@ type Jwt struct {
 	Secret               string
 	AccessTokenExpireIn  int
 	RefreshTokenExpireIn int
-	Issuer               string
 }
 
 func NewJwt() (jwt Jwt) {
@@ -14,6 +13,5 @@ func NewJwt() (jwt Jwt) {
 		Secret:               config.CFG.V.GetString("jwt.secret"),
 		AccessTokenExpireIn:  config.CFG.V.GetInt("jwt.access_token_expire_in"),
 		RefreshTokenExpireIn: config.CFG.V.GetInt("jwt.refresh_token_expire_in"),
-		Issuer:               config.CFG.V.GetString("jwt.issuer"),
 	}
 }
