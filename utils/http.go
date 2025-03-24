@@ -3,8 +3,8 @@
 package utils
 
 import (
-	"hangover/structs"
 	"net/http"
+	"sms/structs"
 	"strconv"
 
 	"github.com/gin-gonic/gin"

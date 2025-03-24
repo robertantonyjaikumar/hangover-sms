@@ -1,63 +1,42 @@
 package utils
 
 import (
-	"fmt"
-	"github.com/golang-jwt/jwt/v4"
-	"github.com/robertantonyjaikumar/hangover-common/config"
-	"hangover/models"
+	"os"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/robertantonyjaikumar/hangover-common/config"
 )
 
-var jwtKey = []byte(config.CFG.V.Get("access_secret").(string))
+var jwtSecret = config.CFG.V.GetString("jwt.secret")
 
-// Define the Claims struct for JWT
-type Claims struct {
-	UserID string `json:"user_id"`
-	jwt.RegisteredClaims
-}
-
-func (*Claims) Valid() error {
-	return nil
-}
-
-// Function to generate JWT token
-func GenerateJWT(user *models.User) (string, error) {
-	claims := &Claims{
-		UserID: user.UUID,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Minute)), // Set expiration time (1 day)
-			Issuer:    config.CFG.V.Get("issuer").(string),
-		},
+// GenerateToken creates a new JWT token with expiration
+func GenerateToken(userID uint, expiry time.Duration) (string, error) {
+	secret := os.Getenv("JWT_SECRET")
+	claims := jwt.MapClaims{
+		"user_id": userID,
+		"exp":     time.Now().Add(expiry).Unix(),
 	}
-
-	// Create the token with claims and sign it
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	// Sign the token with the secret key
-	tokenString, err := token.SignedString(jwtKey)
-	if err != nil {
-		return "", err
-	}
-
-	return tokenString, nil
+	return token.SignedString([]byte(secret))
 }
 
-// Function to validate JWT token
-func ValidateJWT(tokenString string) (*Claims, error) {
-	// Parse and validate the token
-	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		// Make sure the token method is expected
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		// Return the key for signing method
-		return jwtKey, nil
+// ParseToken verifies a token and extracts claims
+func ParseToken(tokenString string) (*jwt.MapClaims, error) {
+	secret := os.Getenv("JWT_SECRET")
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
 	})
 
-	// Return the claims if valid
-	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
-		return claims, nil
-	} else {
+	if err != nil || !token.Valid {
 		return nil, err
 	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, err
+	}
+
+	return &claims, nil
 }

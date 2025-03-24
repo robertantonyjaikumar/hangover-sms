@@ -1,62 +1,88 @@
 package controllers
 
 import (
-	"fmt"
-	"hangover/models"
-	"hangover/structs"
-	"hangover/utils"
+	"sms/config"
+	"sms/models"
+	"sms/utils"
+	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
+	"github.com/robertantonyjaikumar/hangover-common/database"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthRepo struct{}
 
+var jwtConfig = config.NewJwt()
+
 func (a AuthRepo) Login(c *gin.Context) {
-	var loginRequest structs.LoginRequest
+	var req struct {
+		Username string `json:"username" binding:"required"`
+		Password string `json:"password" binding:"required"`
+	}
 
-	if err := c.ShouldBindJSON(&loginRequest); err != nil {
-		// If validation fails, return a bad request status with the error details
-		if validationErrors, ok := err.(validator.ValidationErrors); ok {
-			var errorMessages []string
-			for _, e := range validationErrors {
-				// Collect all validation error messages
-				errorMessages = append(errorMessages, fmt.Sprintf("Field '%s' %s", e.Field(), e.Tag()))
-			}
-			utils.ErrorResponse(c, "Validation error", errorMessages)
-		} else {
-			// If it’s another error (not validation error)
-			utils.ErrorResponse(c, "Invalid request", err.Error())
-		}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.ErrorResponse(c, err.Error(), nil)
 		return
 	}
 
-	user, err := models.ValidateUserByUserNameAndPassword(loginRequest.Username, loginRequest.Password)
-	if err != nil {
-		utils.ErrorResponse(c, "Invalid username or password", err.Error())
+	var user models.User
+	if err := models.First(c, &user, "username = ?", req.Username); err != nil {
+		utils.ErrorResponse(c, err.Error(), nil)
 		return
 	}
 
-	Token, err := utils.GenerateJWT(user)
-	if err != nil {
-		utils.ErrorResponse(c, "Error generating token", err.Error())
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		utils.ErrorResponse(c, err.Error(), nil)
 		return
 	}
-	utils.SuccessResponse(c, "Login successful", Token)
-	return
+
+	accessToken, _ := utils.GenerateToken(user.ID, time.Duration(jwtConfig.AccessTokenExpireIn)*time.Second)
+	refreshToken, _ := utils.GenerateToken(user.ID, time.Duration(jwtConfig.RefreshTokenExpireIn)*time.Second)
+	user.RefreshToken = refreshToken
+	database.Db.Save(&user)
+
+	utils.SuccessResponse(c, "", gin.H{"access_token": accessToken, "refresh_token": refreshToken})
+}
+
+func (a AuthRepo) RefreshToken(c *gin.Context) {
+	var req struct {
+		RefreshToken string `json:"refresh_token" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.ErrorResponse(c, err.Error(), nil)
+		return
+	}
+
+	var user models.User
+	if err := models.First(c, &user, "refresh_token = ?", req.RefreshToken); err != nil {
+		utils.ErrorResponse(c, err.Error(), nil)
+		return
+	}
+
+	accessToken, _ := utils.GenerateToken(user.ID, time.Duration(jwtConfig.AccessTokenExpireIn)*time.Second)
+	utils.SuccessResponse(c, "", gin.H{"access_token": accessToken})
 }
 
 func (a AuthRepo) Logout(c *gin.Context) {
-	utils.SuccessResponse(c, "Logout successful", nil)
-	return
+	var req struct {
+		RefreshToken string `json:"refresh_token" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.ErrorResponse(c, err.Error(), nil)
+		return
+	}
+
+	var user models.User
+	if err := models.First(c, &user, "refresh_token = ?", req.RefreshToken); err != nil {
+		utils.ErrorResponse(c, err.Error(), nil)
+		return
+	}
+
+	user.RefreshToken = ""
+	database.Db.Save(&user)
+
+	utils.SuccessResponse(c, "", nil)
 }
-
-func (a AuthRepo) Register(c *gin.Context) {}
-
-func (a AuthRepo) Refresh(c *gin.Context) {}
-
-func (a AuthRepo) Verify(c *gin.Context) {}
-
-func (a AuthRepo) Forgot(c *gin.Context) {}
-
-func (a AuthRepo) Reset(c *gin.Context) {}

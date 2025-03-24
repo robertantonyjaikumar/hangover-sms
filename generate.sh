@@ -2,54 +2,76 @@
 
 
 # Prompt the user for their name
-# echo "Please enter your name:"
-# read name
+echo "Please enter module name(ex: user, user_group, user_account_type):"
+read file_name
 
-
-
-# Input string
-file_name="user_group"
 
 # Set IFS to a space character
 IFS='_' read -r -a array <<< "$file_name"
 
-title_case=""
+logger_name=""
+model_name=""
+variable_name=""
+table_name=""
 
 # Print the array
 i=0
 for item in "${array[@]}"; do
-    
-    title_case=$(echo "$item")
-    echo "$item"
+    title=$(echo "$item" | awk '{print toupper(substr($0,1,1)) tolower(substr($0,2))}')
+    if [ $i -eq 0 ] ; then
+        logger_name=$(echo "$item")
+        model_name=$(echo "$title")
+        variable_name=$(echo "$item")
+        table_name=$(echo "$item")
+    else
+        logger_name=$(echo "$logger_name $item")
+        model_name=$(echo "$model_name$title")
+        variable_name=$(echo "$variable_name$title")
+        table_name=$(echo $table_name"_"$item)
+    fi
     ((i=i+1))
 done
 
-echo "$i"
+# echo "$logger_name"
+# echo "$model_name"
+# echo "$table_name"
 
-echo "$title_case"
+table_name=$(echo "$table_name"'s')
 
-# echo "Original: $input_word"
-# echo "Lowercase: $lowercase"
-# echo "Uppercase: $uppercase"
-# echo "Titlecase: $titlecase"
-# echo "Snake_case: $snake_case"
-# echo "Kebab-case: $kebab_case"
-# echo "PascalCase: $pascal_case"
-# echo "UPPER_SNAKE_CASE: $upper_snake_case"
+migrationPattern=$(echo "// crud-generator-migration")
+seedPattern=$(echo "// crud-generator-seeds")
+routePattern=$(echo "// crud-generator-router")
 
+migration=$(echo  "\&$model_name{},\n $migrationPattern")
+seedContent=$(echo "\/\/ {Model: \&[]$model_name{}, FileName: \"$table_name.json\", CreateFunc: Seed$model_name},\n $seedPattern")
+routeContent=$(echo $variable_name"Group := v1.Group(\"$file_name\")\n{\n"$model_name"Routes("$variable_name"Group)\n}\n \n $routePattern")
 
-# cp models/a_user_group.go "models/$name.go"
-
-#sleep 2
-
-# sed -i '' "s/UserGroup/$model_name/g" "models/$name.go"
-# sed -i '' "s/user_groups/$table_name/g" "models/$name.go"
-# sed -i '' "s/user group/$logger_name/g" "models/$name.go"
-# sed -i '' "s/userGroup/$variable_name/g" "models/$name.go"
+echo $routeContent
+echo $seedContent
 
 
-#cp routes/auth.go "routes/$name.go"
+cp models/todo.go "models/$file_name.go"
+cp controllers/todo.go "controllers/$file_name.go"
+cp routes/todo.go "routes/$file_name.go"
+cp seeds/todos.json "seeds/$table_name.json"
+sleep 2
 
-#cp controllers/auth.go "controllers/$name.go"
+sed -i '' "s/Todo/$model_name/g" "models/$file_name.go"
+# sed -i '' "s/todos/$table_name/g" "models/$file_name.go"
+sed -i '' "s/todos-logger/$logger_name/g" "models/$file_name.go"
+sed -i '' "s/vartodo/$variable_name/g" "models/$file_name.go"
 
-# echo "Hello, $name!"
+sed -i '' "s/Todo/$model_name/g" "controllers/$file_name.go"
+sed -i '' "s/todo/$variable_name/g" "controllers/$file_name.go"
+sed -i '' "s/Todo/$model_name/g" "routes/$file_name.go"
+
+sed -i '' "s/Todo/$model_name/g" "routes/$file_name.go"
+
+sed -i '' "s|$routePattern|$routeContent|g" "routes/routers.go"
+sed -i '' "s/$migrationPattern/$model_name/g" "routes/$file_name.go"
+sed -i '' "s|$migrationPattern|$migration|g" "models/migrator.go"
+sed -i '' "s|$seedPattern|$seedContent|g" "models/migrator.go"
+
+
+
+echo "Hello, $file_name!"

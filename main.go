@@ -2,16 +2,17 @@ package main
 
 import (
 	"context"
-	"github.com/robertantonyjaikumar/hangover-common/config"
-	"github.com/robertantonyjaikumar/hangover-common/logger"
-	"go.uber.org/zap"
-	"hangover/models"
-	"hangover/routes"
 	"net/http"
 	"os"
 	"os/signal"
+	"sms/models"
+	"sms/routes"
 	"syscall"
 	"time"
+
+	"github.com/robertantonyjaikumar/hangover-common/config"
+	"github.com/robertantonyjaikumar/hangover-common/logger"
+	"go.uber.org/zap"
 )
 
 func main() {

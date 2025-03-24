@@ -1,17 +1,18 @@
-module hangover
+module sms
 
 go 1.24.1
 
 require (
 	github.com/gin-contrib/zap v1.1.4
 	github.com/gin-gonic/gin v1.10.0
-	github.com/go-playground/validator/v10 v10.25.0
-	github.com/golang-jwt/jwt/v4 v4.5.1
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/robertantonyjaikumar/hangover-common v0.0.0-20250318092335-cf0fd8c178eb
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.36.0
 	gorm.io/gorm v1.25.12
 )
+
+require github.com/go-playground/validator/v10 v10.25.0 // indirect
 
 require (
 	github.com/DataDog/appsec-internal-go v1.10.0 // indirect

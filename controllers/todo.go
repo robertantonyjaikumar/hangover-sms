@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"hangover/models"
-	"hangover/utils"
+	"sms/models"
+	"sms/utils"
 
 	"github.com/gin-gonic/gin"
 )

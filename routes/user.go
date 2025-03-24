@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func TodoRoutes(router *gin.RouterGroup) {
-	controller := new(controllers.TodoRepo)
+func UserRoutes(router *gin.RouterGroup) {
+	controller := new(controllers.UserRepo)
 	router.POST("/", controller.Create)
 	router.GET("/pagination", controller.GetAllByPagination)
 	router.GET("/all", controller.GetAll)
