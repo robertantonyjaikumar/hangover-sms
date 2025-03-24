@@ -1,84 +1,97 @@
 #!/bin/bash
 
-
-# Prompt the user for their name
-echo "Please enter module name(ex: user, user_group, user_account_type):"
+# Prompt the user for the module name
+echo "Please enter module name (ex: user, user_group, user_account_type):"
 read file_name
 
-sourceFileName=$(echo "todo")
+# Define source placeholders
+sourceFileName="todo"
+srcModelName="Todo"
+srcTableName="todos"
+srcLoggerName="todos-logger"
+srcVariableName="vartodo"
 
-# Set IFS to a space character
-IFS='_' read -r -a array <<< "$file_name"
+# Initialize variables
+migrationPattern="// crud-generator-migration"
+seedPattern="// crud-generator-seeds"
+routePattern="// crud-generator-router"
 
-logger_name=""
+
+table_name=""
 model_name=""
 variable_name=""
-table_name=""
+logger_name=""
 
-# Print the array
+# Split the file_name into parts based on underscores
+IFS='_' read -r -a array <<< "$file_name"
+
+# Initialize indices for the loop
 i=0
 for item in "${array[@]}"; do
     title=$(echo "$item" | awk '{print toupper(substr($0,1,1)) tolower(substr($0,2))}')
-    if [ $i -eq 0 ] ; then
-        logger_name=$(echo "$item")
-        model_name=$(echo "$title")
-        variable_name=$(echo "$item")
-        table_name=$(echo "$item")
+
+    # First item
+    if [ $i -eq 0 ]; then
+        logger_name="$item"
+        model_name="$title"
+        variable_name="$item"
+        table_name="$item"
     else
-        logger_name=$(echo "$logger_name $item")
-        model_name=$(echo "$model_name$title")
-        variable_name=$(echo "$variable_name$title")
-        table_name=$(echo $table_name"_"$item)
+        logger_name="$logger_name $item"
+        model_name="$model_name$title"
+        variable_name="$variable_name$title"
+        table_name="$table_name"_"$item"
     fi
     ((i=i+1))
 done
 
-# echo "$logger_name"
-# echo "$model_name"
-# echo "$table_name"
+# Append 's' to table_name for pluralization
+table_name="${table_name}s"
 
-table_name=$(echo "$table_name"'s')
-
-migrationPattern=$(echo "// crud-generator-migration")
-seedPattern=$(echo "// crud-generator-seeds")
-routePattern=$(echo "// crud-generator-router")
-
-migration=$(echo  "\&$model_name{},\n $migrationPattern")
-seedContent=$(echo "\/\/ {Model: \&[]$model_name{}, FileName: \"$table_name.json\", CreateFunc: Seed$model_name},\n $seedPattern")
-routeContent=$(echo $variable_name"Group := v1.Group(\"$file_name\")\n{\n"$model_name"Routes("$variable_name"Group)\n}\n \n $routePattern")
-
-echo $routeContent
-echo $seedContent
+# Prepare content for migration, seed, and route
+migration=$(echo "\&$model_name{},\n$migrationPattern")
+seedContent=$(echo "\/\/ {Model: \&[]$model_name{}, FileName: \"$table_name.json\", CreateFunc: Seed$model_name},\n$seedPattern")
+routeContent=$(echo $variable_name"Group := v1.Group(\"$file_name\")\n{\n$model_name""Routes("$variable_name"Group)\n}\n \n$routePattern")
 
 
+# Display the generated content (for debugging purposes)
+# echo "Route Content: $routeContent"
+# echo "Seed Content: $seedContent"
+
+# Copy files to new locations
 cp "models/$sourceFileName.go" "models/$file_name.go"
-cp "controllers/$sourceFileName.go: "controllers/$file_name.go"
+cp "controllers/$sourceFileName.go" "controllers/$file_name.go"
 cp "routes/$sourceFileName.go" "routes/$file_name.go"
-cp "seeds/"$sourceFileName"s.json" "seeds/$table_name.json"
+cp "seeds/$srcTableName.json" "seeds/$table_name.json"
 sleep 2
 
-$srcModelName=$(echo "Todo")
-$srcTableName=$(echo "todos")
-$srcLoggerName=$(echo "todos-logger")
-$srcVariableName=$(echo "vartodo")
 
 
-sed -i '' "s/$srcModelName/$model_name/g" "models/$file_name.go"
-# sed -i '' "s/$srcTableName/$table_name/g" "models/$file_name.go"
-sed -i '' "s/$srcLoggerName/$logger_name/g" "models/$file_name.go"
-sed -i '' "s/$srcVariableName/$variable_name/g" "models/$file_name.go"
+# Replace placeholders in the new files
+replace_in_file() {
+    local src="$1"
+    local dest="$2"
+    local pattern="$3"
+    local replacement="$4"
 
-sed -i '' "s/$srcModelName/$model_name/g" "controllers/$file_name.go"
-sed -i '' "s/$srcVariableName/$variable_name/g" "controllers/$file_name.go"
-sed -i '' "s/$srcModelName/$model_name/g" "routes/$file_name.go"
+    sed -i '' "s|$pattern|$replacement|g" "$dest"
+}
 
-sed -i '' "s/$srcModelName/$model_name/g" "routes/$file_name.go"
+# Replace patterns in models, controllers, and routes
+replace_in_file "$srcModelName" "models/$file_name.go" "$srcModelName" "$model_name"
+replace_in_file "$srcTableName" "models/$file_name.go" "$srcTableName" "$table_name"
+replace_in_file "$srcLoggerName" "models/$file_name.go" "$srcLoggerName" "$logger_name"
+replace_in_file "$srcVariableName" "models/$file_name.go" "$srcVariableName" "$variable_name"
 
-sed -i '' "s|$routePattern|$routeContent|g" "routes/routers.go"
-sed -i '' "s/$migrationPattern/$model_name/g" "routes/$file_name.go"
-sed -i '' "s|$migrationPattern|$migration|g" "models/migrator.go"
-sed -i '' "s|$seedPattern|$seedContent|g" "models/migrator.go"
+replace_in_file "$srcModelName" "controllers/$file_name.go" "$srcModelName" "$model_name"
+replace_in_file "$srcVariableName" "controllers/$file_name.go" "$srcVariableName" "$variable_name"
 
+replace_in_file "$srcModelName" "routes/$file_name.go" "$srcModelName" "$model_name"
 
+# Replace route, migration, and seed patterns in relevant files
+replace_in_file "$routePattern" "routes/routers.go" "$routePattern" "$routeContent"
+replace_in_file "$migrationPattern" "models/migrator.go" "$migrationPattern" "$migration"
+replace_in_file "$seedPattern" "models/migrator.go" "$seedPattern" "$seedContent"
 
+# Completion message
 echo "Hello, $file_name!"
