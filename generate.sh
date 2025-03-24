@@ -5,6 +5,7 @@
 echo "Please enter module name(ex: user, user_group, user_account_type):"
 read file_name
 
+sourceFileName=$(echo "todo")
 
 # Set IFS to a space character
 IFS='_' read -r -a array <<< "$file_name"
@@ -50,22 +51,28 @@ echo $routeContent
 echo $seedContent
 
 
-cp models/todo.go "models/$file_name.go"
-cp controllers/todo.go "controllers/$file_name.go"
-cp routes/todo.go "routes/$file_name.go"
-cp seeds/todos.json "seeds/$table_name.json"
+cp "models/$sourceFileName.go" "models/$file_name.go"
+cp "controllers/$sourceFileName.go: "controllers/$file_name.go"
+cp "routes/$sourceFileName.go" "routes/$file_name.go"
+cp "seeds/"$sourceFileName"s.json" "seeds/$table_name.json"
 sleep 2
 
-sed -i '' "s/Todo/$model_name/g" "models/$file_name.go"
-# sed -i '' "s/todos/$table_name/g" "models/$file_name.go"
-sed -i '' "s/todos-logger/$logger_name/g" "models/$file_name.go"
-sed -i '' "s/vartodo/$variable_name/g" "models/$file_name.go"
+$srcModelName=$(echo "Todo")
+$srcTableName=$(echo "todos")
+$srcLoggerName=$(echo "todos-logger")
+$srcVariableName=$(echo "vartodo")
 
-sed -i '' "s/Todo/$model_name/g" "controllers/$file_name.go"
-sed -i '' "s/todo/$variable_name/g" "controllers/$file_name.go"
-sed -i '' "s/Todo/$model_name/g" "routes/$file_name.go"
 
-sed -i '' "s/Todo/$model_name/g" "routes/$file_name.go"
+sed -i '' "s/$srcModelName/$model_name/g" "models/$file_name.go"
+# sed -i '' "s/$srcTableName/$table_name/g" "models/$file_name.go"
+sed -i '' "s/$srcLoggerName/$logger_name/g" "models/$file_name.go"
+sed -i '' "s/$srcVariableName/$variable_name/g" "models/$file_name.go"
+
+sed -i '' "s/$srcModelName/$model_name/g" "controllers/$file_name.go"
+sed -i '' "s/$srcVariableName/$variable_name/g" "controllers/$file_name.go"
+sed -i '' "s/$srcModelName/$model_name/g" "routes/$file_name.go"
+
+sed -i '' "s/$srcModelName/$model_name/g" "routes/$file_name.go"
 
 sed -i '' "s|$routePattern|$routeContent|g" "routes/routers.go"
 sed -i '' "s/$migrationPattern/$model_name/g" "routes/$file_name.go"
