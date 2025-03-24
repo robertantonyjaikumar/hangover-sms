@@ -37,8 +37,8 @@ func (a AuthRepo) Login(c *gin.Context) {
 		return
 	}
 
-	accessToken, _ := utils.GenerateToken(user.ID, time.Duration(jwtConfig.AccessTokenExpireIn)*time.Second)
-	refreshToken, _ := utils.GenerateToken(user.ID, time.Duration(jwtConfig.RefreshTokenExpireIn)*time.Second)
+	accessToken, _ := utils.GenerateToken(user.UUID, time.Duration(jwtConfig.AccessTokenExpireIn)*time.Second)
+	refreshToken, _ := utils.GenerateToken(user.UUID, time.Duration(jwtConfig.RefreshTokenExpireIn)*time.Second)
 	user.RefreshToken = refreshToken
 	database.Db.Save(&user)
 
@@ -61,7 +61,7 @@ func (a AuthRepo) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	accessToken, _ := utils.GenerateToken(user.ID, time.Duration(jwtConfig.AccessTokenExpireIn)*time.Second)
+	accessToken, _ := utils.GenerateToken(user.UUID, time.Duration(jwtConfig.AccessTokenExpireIn)*time.Second)
 	utils.SuccessResponse(c, "", gin.H{"access_token": accessToken})
 }
 

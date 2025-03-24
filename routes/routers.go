@@ -3,6 +3,8 @@ package routes
 import (
 	"time"
 
+	mw "sms/middlewares"
+
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/robertantonyjaikumar/hangover-common/logger"
@@ -28,9 +30,14 @@ func NewRouter() *gin.Engine {
 		}
 		todoGroup := v1.Group("todo")
 		{
+			todoGroup.Use(mw.AuthMiddleware())
 			TodoRoutes(todoGroup)
 		}
-
+		userGroup := v1.Group("user")
+		{
+			userGroup.Use(mw.AuthMiddleware())
+			UserRoutes(userGroup)
+		}
 		// crud-generator-router
 	}
 	return router

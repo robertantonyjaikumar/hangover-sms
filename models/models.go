@@ -67,3 +67,38 @@ func Delete(c context.Context, value interface{}, conds ...interface{}) error {
 	}
 	return nil
 }
+
+func Count(c context.Context, item interface{}, conds ...interface{}) (count int64, err error) {
+	if result := database.Db.Model(item).Where(conds).Count(&count); result.Error != nil {
+		return 0, result.Error
+	}
+	return count, nil
+}
+
+func Exists(c context.Context, item interface{}, conds ...interface{}) (bool, error) {
+	if result := database.Db.Where(conds).First(item); result.Error != nil {
+		return false, result.Error
+	}
+	return true, nil
+}
+
+func FirstOrCreate(c context.Context, item interface{}, conds ...interface{}) error {
+	if result := database.Db.FirstOrCreate(item, conds...); result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func UpdateOrCreate(c context.Context, item interface{}, updates interface{}, conds ...interface{}) error {
+	if result := database.Db.Where(conds).Assign(updates).FirstOrCreate(item); result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func Save(c context.Context, item interface{}) error {
+	if result := database.Db.Save(item); result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
