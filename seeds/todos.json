@@ -1,7 +1,7 @@
 [
     {
       "title": "Test",
-      "slig":"test",
+      "slug":"test",
       "description": "test",
       "Status": "active"
     }

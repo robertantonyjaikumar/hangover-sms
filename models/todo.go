@@ -11,19 +11,19 @@ import (
 type Todo struct {
 	PreModelWithUUID
 	Title       string `json:"title"`
-	Slug        string `json:slug`
+	Slug        string `json:"slug"`
 	Description string `json:"description"`
 	Status      string `json:"status"`
 }
 
 func SeedTodo(model interface{}) error {
-	todos, ok := model.(*[]Todo)
+	vartodos, ok := model.(*[]Todo)
 	if !ok {
 		return fmt.Errorf("invalid model type")
 	}
-	for _, todo := range *todos {
-		if err := database.Db.FirstOrCreate(&todo, "slug = ?", todo.Slug).Error; err != nil {
-			logger.Error("Error creating user seed: "+todo.Slug, zap.Error(err))
+	for _, vartodos := range *vartodos {
+		if err := database.Db.FirstOrCreate(&vartodos, "slug = ?", vartodos.Slug).Error; err != nil {
+			logger.Error("Error creating todos-logger seed: "+vartodos.Slug, zap.Error(err))
 			return err
 		}
 	}

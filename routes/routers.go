@@ -30,6 +30,8 @@ func NewRouter() *gin.Engine {
 		{
 			TodoRoutes(todoGroup)
 		}
+
+		// crud-generator-router
 	}
 	return router
 }

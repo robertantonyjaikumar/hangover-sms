@@ -17,6 +17,7 @@ func GetTables() []interface{} {
 		&RolePermission{},
 		&Group{},
 		&Todo{},
+		// crud-generator-migration
 	}
 }
 
@@ -36,6 +37,7 @@ func SeedDB() {
 		// {Model: &[]Role{}, FileName: "roles.json", CreateFunc: SeedRole},
 		// {Model: &[]User{}, FileName: "users.json", CreateFunc: SeedUser},
 		{Model: &[]Todo{}, FileName: "todos.json", CreateFunc: SeedTodo},
+		// crud-generator-seeds
 	}
 	for _, s := range seed {
 		if err := models.SeedModel(s.FileName, s.Model, s.CreateFunc); err != nil {
