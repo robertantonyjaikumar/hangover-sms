@@ -3,6 +3,7 @@ package controllers
 import (
 	"sms/config"
 	"sms/models"
+	"sms/structs"
 	"sms/utils"
 	"time"
 
@@ -15,11 +16,19 @@ type AuthRepo struct{}
 
 var jwtConfig = config.NewJwt()
 
+// @Summary Login
+// @Description Authenticate user and return access and refresh tokens
+// @Tags Auth
+// @Accept json
+// @Produce json
+//
+//	@Param			LoginRequest	body		structs.LoginRequest	true	"Add account"
+//
+// @Success 200 {object} structs.Response
+// @Failure 400 {object} structs.Response
+// @Router /auth/login [post]
 func (a AuthRepo) Login(c *gin.Context) {
-	var req struct {
-		Username string `json:"username" binding:"required"`
-		Password string `json:"password" binding:"required"`
-	}
+	var req structs.LoginRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.ErrorResponse(c, err.Error(), nil)
@@ -45,10 +54,19 @@ func (a AuthRepo) Login(c *gin.Context) {
 	utils.SuccessResponse(c, "", gin.H{"access_token": accessToken, "refresh_token": refreshToken})
 }
 
+// @Summary Refresh Token
+// @Description Generate a new access token using the refresh token
+// @Tags Auth
+// @Accept json
+// @Produce json
+//
+//	@Param			RefreshTokenRequest	body		structs.RefreshTokenRequest	true	"Add account"
+//
+// @Success 200 Response body structs.Response true "Success"
+// @Failure 400 Response body structs.Response true "Error"
+// @Router /auth/refresh-token [post]
 func (a AuthRepo) RefreshToken(c *gin.Context) {
-	var req struct {
-		RefreshToken string `json:"refresh_token" binding:"required"`
-	}
+	var req structs.RefreshTokenRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.ErrorResponse(c, err.Error(), nil)
@@ -65,10 +83,20 @@ func (a AuthRepo) RefreshToken(c *gin.Context) {
 	utils.SuccessResponse(c, "", gin.H{"access_token": accessToken})
 }
 
+// @Summary Logout
+// @Description Invalidate the refresh token
+// @Tags Auth
+// @Accept json
+// @Produce json
+// /
+//
+//	@Param			RefreshTokenRequest	body		structs.RefreshTokenRequest	true	"Add account"
+//
+// @Success 200 Response body structs.Response true "Success"
+// @Failure 400 Response body structs.Response true "Error"
+// @Router /auth/logout [post]
 func (a AuthRepo) Logout(c *gin.Context) {
-	var req struct {
-		RefreshToken string `json:"refresh_token" binding:"required"`
-	}
+	var req structs.LogoutRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.ErrorResponse(c, err.Error(), nil)

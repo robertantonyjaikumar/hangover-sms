@@ -31,7 +31,7 @@ func SeedDB() {
 		// {Model: &[]Group{}, FileName: "user_groups.json", CreateFunc: SeedUserGroup},
 		// {Model: &[]Role{}, FileName: "roles.json", CreateFunc: SeedRole},
 		// {Model: &[]User{}, FileName: "users.json", CreateFunc: SeedUser},
-		// {Model: &[]Todo{}, FileName: "todos.json", CreateFunc: SeedTodo},
+		{Model: &[]Todo{}, FileName: "todos.json", CreateFunc: SeedTodo},
 		// crud-generator-seeds
 	}
 	for _, s := range seed {
