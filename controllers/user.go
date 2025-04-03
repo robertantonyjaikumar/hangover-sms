@@ -58,17 +58,15 @@ func (u UserRepo) Update(c *gin.Context) {
 		return
 	}
 
+	if err := models.Update(c, models.User{}, updates, id); err != nil {
+		utils.ErrorResponse(c, err.Error(), nil)
+		return
+	}
+
 	if err := models.First(c, &user, id); err != nil {
 		utils.ErrorResponse(c, err.Error(), nil)
 		return
 	}
-
-	err := models.Update(c, &user, updates)
-	if err != nil {
-		utils.ErrorResponse(c, err.Error(), nil)
-		return
-	}
-
 	utils.SuccessResponse(c, "", user)
 }
 
