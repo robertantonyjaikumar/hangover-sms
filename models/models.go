@@ -14,9 +14,9 @@ func Create(c context.Context, item interface{}) (err error) {
 	return
 }
 
-func Update(c context.Context, item interface{}, updates interface{}, conds ...interface{}) error {
+func Update(c context.Context, item interface{}, updates interface{}, filter string, conds ...interface{}) error {
 
-	query := database.Db.Model(&item).Where(conds)
+	query := database.Db.Model(&item).Where(filter, conds...)
 	if result := query.Updates(updates); result.Error != nil {
 		return result.Error
 	}

@@ -55,5 +55,33 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 			return err
 		}
 	}
+	middleName := ""
+	if u.MiddleName != "" {
+		middleName = fmt.Sprintf(" %s", u.MiddleName)
+	}
+	u.DisplayName = fmt.Sprintf("%s%s %s", u.FirstName, middleName, u.LastName)
+	return nil
+}
+
+func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {
+	if u.Password != "" {
+		hashedPassword, hashErr := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+		if hashErr != nil {
+			logger.Error("Error hashing password", zap.Error(hashErr))
+			return hashErr
+		}
+		u.Password = string(hashedPassword)
+		if err != nil {
+			logger.Error("Error hashing password", zap.Error(err))
+			return err
+		}
+	}
+	middleName := ""
+	if u.MiddleName != "" {
+		middleName = fmt.Sprintf(" %s", u.MiddleName)
+	}
+	u.DisplayName = fmt.Sprintf("%s%s %s", u.FirstName, middleName, u.LastName)
+
+	logger.Info("BeforeUpdate", zap.String("DisplayName", u.DisplayName))
 	return nil
 }

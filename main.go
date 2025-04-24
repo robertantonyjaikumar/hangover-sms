@@ -31,10 +31,10 @@ import (
 // @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
 	models.MigrateDB()
-	// models.SeedDB()
+	models.SeedDB()
 	// Create CORS middleware options
 	corsHandler := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:5173"}, // Allow React frontend origin
+		AllowedOrigins:   []string{"http://localhost:3000"}, // Allow React frontend origin
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
 		AllowedHeaders:   []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,
