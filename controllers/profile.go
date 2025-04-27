@@ -2,14 +2,18 @@ package controllers
 
 import (
 	"fmt"
+	"time"
+
+	"path/filepath"
+
 	"github.com/gin-gonic/gin"
 	"github.com/robertantonyjaikumar/hangover-common/database"
 	"github.com/robertantonyjaikumar/hangover-common/logger"
 	"go.uber.org/zap"
+
 	"sms/models"
 	"sms/structs"
 	"sms/utils"
-	"time"
 )
 
 type ProfileRepo struct{}
@@ -33,24 +37,51 @@ func (u ProfileRepo) Get(c *gin.Context) {
 func (u ProfileRepo) Update(c *gin.Context) {
 	var user models.User
 	id := c.Param("id")
-	var updates map[string]interface{}
 
-	if err := c.ShouldBindJSON(&updates); err != nil {
+	// Parse JSON fields
+	//var updates map[string]interface{}
+
+	if err := c.ShouldBind(&user); err != nil {
 		utils.ErrorResponse(c, err.Error(), nil)
 		return
 	}
 
-	if err := models.Update(c, models.User{}, updates, id); err != nil {
+	// Handle image upload if file exists
+	file, err := c.FormFile("image")
+	if err == nil {
+
+		// Generate a unique file name (use the current timestamp and the original file extension)
+		ext := filepath.Ext(file.Filename)
+		fileName := fmt.Sprintf("%v%s", id, ext)
+
+		// Define the path where the image will be saved
+		path := fmt.Sprintf("static/img/profile/%s", fileName)
+
+		// Save the uploaded file to the defined path
+		if err := c.SaveUploadedFile(file, path); err != nil {
+			utils.ErrorResponse(c, "Failed to upload image", err.Error())
+			return
+		}
+
+		// Add image URL to updates payload
+		imageURL := fmt.Sprintf("%s/%s", utils.GetHost(c), path)
+		user.Image = imageURL
+	}
+
+	// Update the user data in the DB
+	if err := models.Update(c, models.User{}, user, id); err != nil {
 		utils.ErrorResponse(c, err.Error(), nil)
 		return
 	}
 
+	// Retrieve the updated user data
 	if err := models.First(c, &user, id); err != nil {
 		utils.ErrorResponse(c, err.Error(), nil)
 		return
 	}
 
-	utils.SuccessResponse(c, "", user)
+	// Respond with success
+	utils.SuccessResponse(c, "User updated successfully", user)
 }
 
 // ==================== FORGOT PASSWORD ====================
@@ -63,7 +94,7 @@ func (u ProfileRepo) ForgotPassword(c *gin.Context) {
 		return
 	}
 
-	logger.Info("Forgot password requested", zap.Any("email", input.Email))
+	logger.Info("Forgot password requested", zap.String("email", input.Email))
 
 	var user models.User
 	if err := models.First(c, &user, "email = ?", input.Email); err != nil {
@@ -71,7 +102,6 @@ func (u ProfileRepo) ForgotPassword(c *gin.Context) {
 		return
 	}
 
-	// Generate tokens
 	accessToken, err := utils.GenerateToken(user.UUID, time.Duration(jwtConfig.AccessTokenExpireIn)*time.Second)
 	if err != nil {
 		utils.ErrorResponse(c, "Failed to generate access token", nil)
@@ -90,11 +120,27 @@ func (u ProfileRepo) ForgotPassword(c *gin.Context) {
 		return
 	}
 
-	// Build dynamic reset link
 	resetLink := fmt.Sprintf("%s/v1/user-profile/reset-password?token=%s", utils.GetHost(c), accessToken)
 	logger.Info("Password reset link generated", zap.String("link", resetLink))
 
-	// TODO: send reset link via email
+	// need to fetch the email content from DB
+	htmlBody := fmt.Sprintf(`
+		<html>
+			<body>
+				<p>Hi %s,</p>
+				<p>We received a request to reset your password. Click the link below to set a new one:</p>
+				<p><a href="%s">Reset Your Password</a></p>
+				<p>If you didn’t request this, you can safely ignore this email.</p>
+				<br/>
+				<p>Thanks,<br/>The Support Team</p>
+			</body>
+		</html>
+	`, user.FirstName, resetLink)
+
+	if err := utils.SendEmail(user.Email, "Reset Your Password", htmlBody); err != nil {
+		utils.ErrorResponse(c, "Failed to send email", err.Error())
+		return
+	}
 
 	utils.SuccessResponse(c, "Password reset link sent to email", gin.H{
 		"reset_link": resetLink,
@@ -116,7 +162,6 @@ func (u ProfileRepo) ResetPassword(c *gin.Context) {
 		return
 	}
 
-	// Parse token
 	claims, err := utils.ParseToken(token)
 	if err != nil {
 		utils.UnAuthorizedResponse(c, "Invalid or expired reset token", nil)
@@ -129,22 +174,19 @@ func (u ProfileRepo) ResetPassword(c *gin.Context) {
 		return
 	}
 
-	// Fetch user
 	var user models.User
 	if err := models.First(c, &user, "uuid = ?", userUUID); err != nil {
 		utils.ErrorResponse(c, "User not found", nil)
 		return
 	}
 
-	//// Hash password
-	//hashedPassword, err := utils.HashPassword(input.NewPassword)
-	//if err != nil {
-	//	utils.ErrorResponse(c, "Failed to hash new password", nil)
-	//	return
-	//}
+	hashedPassword, err := utils.HashPassword(input.NewPassword)
+	if err != nil {
+		utils.ErrorResponse(c, "Failed to hash new password", nil)
+		return
+	}
 
-	// Save new password
-	user.Password = input.NewPassword
+	user.Password = hashedPassword
 	if err := models.Save(c, &user); err != nil {
 		utils.ErrorResponse(c, "Failed to update password", err.Error())
 		return

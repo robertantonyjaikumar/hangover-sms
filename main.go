@@ -40,6 +40,10 @@ func main() {
 		AllowCredentials: true,
 	})
 	router := routes.NewRouter()
+
+	// 👉 Serve static files for uploaded images
+	router.Static("/static/img/", "./static/img/")
+
 	// Apply CORS middleware to the router (wrap it with the cors handler)
 	handler := corsHandler.Handler(router)
 	// Create a new HTTP server with custom configuration
