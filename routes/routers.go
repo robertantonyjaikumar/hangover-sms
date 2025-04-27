@@ -49,6 +49,11 @@ func NewRouter() *gin.Engine {
 			// userGroup.Use(mw.AuthMiddleware())
 			UserRoutes(userGroup)
 		}
+		profileGroup := v1.Group("user-profile")
+		{
+
+			ProfileRoutes(profileGroup)
+		}
 
 		// crud-generator-router
 	}

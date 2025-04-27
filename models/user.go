@@ -26,6 +26,7 @@ type User struct {
 	RefreshToken  string     `gorm:"type:text"`
 	LastLoginAt   *time.Time `json:"last_login_at"`
 	LastLoginIP   string     `json:"last_login_ip"`
+	Image         string     `json:"image"` // Path to stored image
 }
 
 func SeedUser(model interface{}) error {

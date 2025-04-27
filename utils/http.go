@@ -3,6 +3,7 @@
 package utils
 
 import (
+	"fmt"
 	"net/http"
 	"sms/structs"
 	"strconv"
@@ -38,4 +39,15 @@ func GetPaginationParams(c *gin.Context) (offset int, limit int) {
 	}
 
 	return offset, limit
+}
+
+func GetHost(c *gin.Context) (host string) {
+	origin := c.Request.Host
+	scheme := "https"
+	if c.Request.TLS == nil {
+		scheme = "http"
+	}
+
+	host = fmt.Sprintf("%s://%s", scheme, origin)
+	return
 }

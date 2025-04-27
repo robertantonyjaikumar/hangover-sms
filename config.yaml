@@ -4,7 +4,7 @@ database:
   driver: postgres
   host: localhost
   port: 5432
-  dbname: sms
+  dbname: sms_dev
   user: postgres
   password: postgres
 env: local
@@ -12,4 +12,4 @@ jwt:
   secret: $eEcr3t
   access_token_expire_in: 300
   refresh_token_expire_in: 86400
-seed_path: "/Users/jai/Documents/Projects/UK/gin-starter/seeds/"
+seed_path: "/home/anto/hangover-sms/seeds/"
