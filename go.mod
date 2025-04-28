@@ -6,6 +6,7 @@ require (
 	github.com/gin-contrib/zap v1.1.4
 	github.com/gin-gonic/gin v1.10.0
 	github.com/golang-jwt/jwt/v5 v5.2.2
+	github.com/joho/godotenv v1.5.1
 	github.com/robertantonyjaikumar/hangover-common v0.0.0-20250318092335-cf0fd8c178eb
 	github.com/rs/cors v1.11.1
 	github.com/swaggo/files v1.0.1

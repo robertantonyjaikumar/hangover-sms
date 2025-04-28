@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"github.com/joho/godotenv"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -32,6 +34,12 @@ import (
 func main() {
 	models.MigrateDB()
 	models.SeedDB()
+
+	err := godotenv.Load("db.env")
+	if err != nil {
+		log.Fatal("Error loading db.env file")
+	}
+
 	// Create CORS middleware options
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000"}, // Allow React frontend origin
