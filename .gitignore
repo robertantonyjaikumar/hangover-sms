@@ -12,7 +12,7 @@ Gopkg.toml
 
 # IDE/Editor folders
 .vscode/
-/.idea/
+.idea/
 /*.swp
 *.sublime-workspace
 *.sublime-project
