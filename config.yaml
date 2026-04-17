@@ -5,7 +5,11 @@ database:
   host: localhost
   port: 5432
   dbname: mg
-env: "local"
-access_secret: test-code
-issuer: hangover
+  user: jai
+  password: jai
+env: local
+jwt:
+  secret: $eEcr3t
+  access_token_expire_in: 300
+  refresh_token_expire_in: 86400
 seed_path: "/Users/jai/Documents/Projects/UK/gin-starter/seeds/"

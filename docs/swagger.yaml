@@ -1,0 +1,117 @@
+basePath: /v1
+definitions:
+  structs.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  structs.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  structs.Response:
+    properties:
+      data: {}
+      msg:
+        type: string
+      status:
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8081
+info:
+  contact:
+    email: robertantonyjaikumar@gmail.com
+    name: Antony Raj, Jaikumar, Richard
+  description: School Management System.
+  termsOfService: http://swagger.io/terms/
+  title: SMS API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return access and refresh tokens
+      parameters:
+      - description: Add account
+        in: body
+        name: LoginRequest
+        required: true
+        schema:
+          $ref: '#/definitions/structs.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.Response'
+      summary: Login
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Invalidate the refresh token
+      parameters:
+      - description: Add account
+        in: body
+        name: RefreshTokenRequest
+        required: true
+        schema:
+          $ref: '#/definitions/structs.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: Response
+        "400":
+          description: Error
+          schema:
+            type: Response
+      summary: Logout
+      tags:
+      - Auth
+  /auth/refresh-token:
+    post:
+      consumes:
+      - application/json
+      description: Generate a new access token using the refresh token
+      parameters:
+      - description: Add account
+        in: body
+        name: RefreshTokenRequest
+        required: true
+        schema:
+          $ref: '#/definitions/structs.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: Response
+        "400":
+          description: Error
+          schema:
+            type: Response
+      summary: Refresh Token
+      tags:
+      - Auth
+swagger: "2.0"
