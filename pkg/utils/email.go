@@ -4,26 +4,20 @@ import (
 	"fmt"
 	"github.com/robertantonyjaikumar/hangover-common/logger"
 	"net/smtp"
+	"sms/config"
 )
 
-var (
-	smtpHost = "smtp.gmail.com"
-	smtpPort = "587"
-	//smtpEmail    = os.Getenv("EMAIL_SENDER") // todo: have to fix -  not able to read the .env values
-	//smtpPassword = os.Getenv("EMAIL_PASSWORD")
-	smtpEmail    = "antonyrajjacobg@gmail.com"
-	smtpPassword = "omui kyoc qvcl eweb"
-)
+var emailConfig = config.NewEmail()
 
 func SendEmail(to string, subject string, htmlBody string) error {
-	logger.Info("Sending email to " + smtpEmail)
-	auth := smtp.PlainAuth("", smtpEmail, smtpPassword, smtpHost)
+	logger.Info("Sending email to " + emailConfig.Sender)
+	auth := smtp.PlainAuth("", emailConfig.Sender, emailConfig.Password, emailConfig.Host)
 
 	headers := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-version: 1.0;\r\nContent-Type: text/html; charset=\"UTF-8\";\r\n\r\n",
-		smtpEmail, to, subject)
+		emailConfig.Sender, to, subject)
 
 	message := []byte(headers + htmlBody)
 
-	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, smtpEmail, []string{to}, message)
+	err := smtp.SendMail(emailConfig.Host+":"+emailConfig.Port, auth, emailConfig.Sender, []string{to}, message)
 	return err
 }

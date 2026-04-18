@@ -13,3 +13,8 @@ jwt:
   access_token_expire_in: 300
   refresh_token_expire_in: 86400
 seed_path: "/Users/jai/Documents/Projects/UK/gin-starter/seeds/"
+email:
+  host: "smtp.gmail.com"
+  port: "587"
+  sender: "antonyrajjacobg@gmail.com"
+  password: "omui kyoc qvcl eweb"
